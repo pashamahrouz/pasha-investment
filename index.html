@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pasha Investment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE;
+    --red: #D85A30; --amber: #BA7517;
+    --bg: #0D0F0E; --bg2: #141716;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #F0EDE8; --text2: #9A9890; --text3: #5A5956;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.7; }
+  body.fa { font-family: 'Vazirmatn', sans-serif; }
+  body.en { font-family: 'DM Sans', sans-serif; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,15,14,0.92); backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .nav-logo { font-size: 17px; font-weight: 700; color: var(--text); text-decoration: none; font-family: 'DM Sans', sans-serif; }
+  .nav-logo span { color: var(--green); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--text); }
+  .soon { font-size: 10px; background: rgba(186,117,23,0.15); color: #F0B840; padding: 2px 7px; border-radius: 10px; margin-right: 4px; }
+  html[dir="ltr"] .soon { margin-right: 0; margin-left: 4px; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-badge { font-size: 11px; background: var(--green-light); color: var(--green-dark); padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+  .lang-btn {
+    font-size: 12px; font-weight: 600; padding: 5px 14px;
+    border-radius: 20px; border: 0.5px solid var(--border2);
+    background: transparent; color: var(--text2); cursor: pointer;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em;
+  }
+  .lang-btn:hover { border-color: var(--green); color: var(--green); }
+
+  .hero {
+    padding: 72px 32px 56px; border-bottom: 0.5px solid var(--border);
+    background: radial-gradient(ellipse at 60% 0%, rgba(29,158,117,0.08) 0%, transparent 60%);
+  }
+  .hero-inner { max-width: 720px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--green); background: rgba(29,158,117,0.1);
+    border: 0.5px solid rgba(29,158,117,0.3); border-radius: 20px; padding: 4px 14px; margin-bottom: 20px;
+  }
+  .hero-tag::before { content: '●'; font-size: 8px; }
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.35; color: var(--text); margin-bottom: 16px; }
+  h1 em { font-style: normal; color: var(--green); }
+  .hero-desc { font-size: 15px; color: var(--text2); max-width: 520px; margin-bottom: 32px; }
+  .hero-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    font-size: 12px; padding: 7px 16px; border-radius: 20px;
+    border: 0.5px solid var(--border2); background: transparent;
+    color: var(--text2); cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .filter-btn:hover { border-color: var(--green); color: var(--green); }
+  .filter-btn.active { background: var(--green); color: white; border-color: var(--green); }
+  .tf-row { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .tf-pill {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    border: 0.5px solid var(--border); color: var(--text3); cursor: pointer;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif; background: transparent;
+  }
+  .tf-pill:hover { border-color: #185FA5; color: #6EB3F7; }
+
+  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 0.5px solid var(--border); }
+  .stat-item { padding: 24px 32px; }
+  html[dir="rtl"] .stat-item { border-right: 0.5px solid var(--border); }
+  html[dir="rtl"] .stat-item:last-child { border-right: none; }
+  html[dir="ltr"] .stat-item { border-left: 0.5px solid var(--border); }
+  html[dir="ltr"] .stat-item:first-child { border-left: none; }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--text); font-family: 'DM Sans', sans-serif; }
+  .stat-num.green { color: var(--green); }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  .section { padding: 32px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--text2); }
+  .see-all { font-size: 12px; color: var(--green); text-decoration: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px;
+    overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.15s;
+  }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .card-chart { height: 120px; overflow: hidden; }
+  .card-chart svg { width: 100%; height: 100%; }
+  .card-body { padding: 14px; }
+  .card-pair { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; font-family: 'DM Sans', sans-serif; }
+  .card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  .b-tf { background: rgba(24,95,165,0.15); color: #6EB3F7; }
+  .b-buy { background: rgba(29,158,117,0.15); color: #4DD4A0; }
+  .b-sell { background: rgba(216,90,48,0.15); color: #F09970; }
+  .b-wait { background: rgba(186,117,23,0.15); color: #F0B840; }
+  .card-time { font-size: 11px; color: var(--text3); margin-top: 8px; }
+
+  footer { border-top: 0.5px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { font-size: 14px; font-weight: 700; color: var(--text2); font-family: 'DM Sans', sans-serif; }
+  .footer-logo span { color: var(--green); }
+  .footer-text { font-size: 12px; color: var(--text3); }
+</style>
+</head>
+<body class="fa">
+
+<nav>
+  <a class="nav-logo" href="#">Pasha <span>Investment</span></a>
+  <div class="nav-links">
+    <a href="#" data-fa="تحلیل‌ها" data-en="Analyses">تحلیل‌ها</a>
+    <a href="#">
+      <span class="soon" data-fa="به زودی" data-en="Soon">به زودی</span><span data-fa="لایو تریدینگ" data-en="Live Trading">لایو تریدینگ</span>
+    </a>
+    <a href="#" data-fa="درباره" data-en="About">درباره</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge" data-fa="۱۲ تحلیل جدید" data-en="12 New Analyses">۱۲ تحلیل جدید</span>
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag" data-fa="تحلیل‌های روز بازار" data-en="Daily Market Analysis">تحلیل‌های روز بازار</div>
+    <h1 id="hero-h1">تحلیل حرفه‌ای<br><em>بازارهای مالی</em></h1>
+    <p class="hero-desc" data-fa="آخرین تحلیل‌های تکنیکال فارکس، طلا، و شاخص‌های جهانی با نقاط ورود و خروج دقیق" data-en="Latest technical analyses of Forex, Gold, and global indices with precise entry and exit points">آخرین تحلیل‌های تکنیکال فارکس، طلا، و شاخص‌های جهانی با نقاط ورود و خروج دقیق</p>
+    <div class="hero-filters">
+      <button class="filter-btn active" data-fa="همه" data-en="All" onclick="setFilter(this)">همه</button>
+      <button class="filter-btn" data-fa="فارکس" data-en="Forex" onclick="setFilter(this)">فارکس</button>
+      <button class="filter-btn" data-fa="طلا" data-en="Gold" onclick="setFilter(this)">طلا</button>
+      <button class="filter-btn" data-fa="شاخص‌ها" data-en="Indices" onclick="setFilter(this)">شاخص‌ها</button>
+      <button class="filter-btn" data-fa="کریپتو" data-en="Crypto" onclick="setFilter(this)">کریپتو</button>
+    </div>
+    <div class="tf-row">
+      <button class="tf-pill">M15</button><button class="tf-pill">M30</button>
+      <button class="tf-pill">H1</button><button class="tf-pill">H4</button><button class="tf-pill">D1</button>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num green">78%</div><div class="stat-label" data-fa="دقت تحلیل‌ها" data-en="Analysis Accuracy">دقت تحلیل‌ها</div></div>
+  <div class="stat-item"><div class="stat-num">142</div><div class="stat-label" data-fa="تحلیل ثبت‌شده" data-en="Published Analyses">تحلیل ثبت‌شده</div></div>
+  <div class="stat-item"><div class="stat-num">5</div><div class="stat-label" data-fa="بازار فعال" data-en="Active Markets">بازار فعال</div></div>
+</div>
+
+<section class="section">
+  <div class="section-header">
+    <span class="section-title" data-fa="آخرین تحلیل‌ها" data-en="Latest Analyses">آخرین تحلیل‌ها</span>
+    <a href="#" class="see-all" data-fa="مشاهده همه ←" data-en="View all →">مشاهده همه ←</a>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(29,158,117,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">XAU/USD — <span data-fa="طلا" data-en="Gold">طلا</span></div>
+        <div class="card-meta"><span class="badge b-tf">M30</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
+        <div class="card-time" data-fa="امروز · ۱۴:۳۰" data-en="Today · 14:30">امروز · ۱۴:۳۰</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(216,90,48,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78" fill="none" stroke="#D85A30" stroke-width="2"/><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78 260,0 0,0" fill="rgba(216,90,48,0.08)" stroke="none"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">EUR/USD</div>
+        <div class="card-meta"><span class="badge b-tf">H1</span><span class="badge b-sell" data-fa="▼ فروش" data-en="▼ Sell">▼ فروش</span></div>
+        <div class="card-time" data-fa="امروز · ۱۱:۰۰" data-en="Today · 11:00">امروز · ۱۱:۰۰</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(186,117,23,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,60 40,55 80,65 120,52 160,58 200,50 260,54" fill="none" stroke="#BA7517" stroke-width="2"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">DOW JONES</div>
+        <div class="card-meta"><span class="badge b-tf">H4</span><span class="badge b-wait" data-fa="● انتظار" data-en="● Wait">● انتظار</span></div>
+        <div class="card-time" data-fa="دیروز · ۲۰:۰۰" data-en="Yesterday · 20:00">دیروز · ۲۰:۰۰</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(29,158,117,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,100 40,85 70,90 100,65 130,55 160,35 200,40 240,20 260,18" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,100 40,85 70,90 100,65 130,55 160,35 200,40 240,20 260,18 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">GBP/USD</div>
+        <div class="card-meta"><span class="badge b-tf">H1</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
+        <div class="card-time" data-fa="دیروز · ۱۶:۰۰" data-en="Yesterday · 16:00">دیروز · ۱۶:۰۰</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(216,90,48,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,30 50,25 90,35 130,50 170,42 210,60 260,72" fill="none" stroke="#D85A30" stroke-width="2"/><polyline points="0,30 50,25 90,35 130,50 170,42 210,60 260,72 260,0 0,0" fill="rgba(216,90,48,0.08)" stroke="none"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">USD/JPY</div>
+        <div class="card-meta"><span class="badge b-tf">D1</span><span class="badge b-sell" data-fa="▼ فروش" data-en="▼ Sell">▼ فروش</span></div>
+        <div class="card-time" data-fa="۲ روز پیش · ۱۰:۰۰" data-en="2 days ago · 10:00">۲ روز پیش · ۱۰:۰۰</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-chart" style="background:rgba(29,158,117,0.05)">
+        <svg viewBox="0 0 260 120"><polyline points="0,80 40,70 80,75 110,55 140,45 170,30 210,35 260,15" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,80 40,70 80,75 110,55 140,45 170,30 210,35 260,15 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-pair">BTC/USD</div>
+        <div class="card-meta"><span class="badge b-tf">H4</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
+        <div class="card-time" data-fa="۳ روز پیش · ۰۸:۰۰" data-en="3 days ago · 08:00">۳ روز پیش · ۰۸:۰۰</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Pasha <span>Investment</span></div>
+  <div class="footer-text" data-fa="تمامی تحلیل‌ها جنبه آموزشی دارند" data-en="All analyses are for educational purposes only">تمامی تحلیل‌ها جنبه آموزشی دارند</div>
+</footer>
+
+<script>
+let lang = 'fa';
+function toggleLang() {
+  lang = lang === 'fa' ? 'en' : 'fa';
+  const isEn = lang === 'en';
+  document.documentElement.lang = isEn ? 'en' : 'fa';
+  document.documentElement.dir = isEn ? 'ltr' : 'rtl';
+  document.body.className = isEn ? 'en' : 'fa';
+  document.getElementById('langBtn').textContent = isEn ? 'FA' : 'EN';
+  document.getElementById('hero-h1').innerHTML = isEn
+    ? 'Professional Analysis<br><em>of Financial Markets</em>'
+    : 'تحلیل حرفه‌ای<br><em>بازارهای مالی</em>';
+  document.querySelectorAll('[data-fa][data-en]').forEach(el => {
+    el.textContent = isEn ? el.dataset.en : el.dataset.fa;
+  });
+}
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
