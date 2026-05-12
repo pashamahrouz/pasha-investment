@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Pasha Investment</title>
+<title>Pasha Investment — تحلیل بازارهای مالی</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE;
     --red: #D85A30; --amber: #BA7517;
-    --bg: #0D0F0E; --bg2: #141716;
+    --bg: #0D0F0E; --bg2: #141716; --bg3: #1A1D1C;
     --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
     --text: #F0EDE8; --text2: #9A9890; --text3: #5A5956;
   }
@@ -33,15 +34,33 @@
   .nav-links a:hover { color: var(--text); }
   .soon { font-size: 10px; background: rgba(186,117,23,0.15); color: #F0B840; padding: 2px 7px; border-radius: 10px; margin-right: 4px; }
   html[dir="ltr"] .soon { margin-right: 0; margin-left: 4px; }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-  .nav-badge { font-size: 11px; background: var(--green-light); color: var(--green-dark); padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
   .lang-btn {
     font-size: 12px; font-weight: 600; padding: 5px 14px;
     border-radius: 20px; border: 0.5px solid var(--border2);
     background: transparent; color: var(--text2); cursor: pointer;
-    transition: all 0.15s; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em;
+    font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em;
   }
   .lang-btn:hover { border-color: var(--green); color: var(--green); }
+  .btn-login {
+    font-size: 13px; padding: 7px 16px; border-radius: 8px;
+    border: 0.5px solid var(--border2); background: transparent;
+    color: var(--text2); cursor: pointer; font-family: inherit;
+  }
+  .btn-login:hover { color: var(--text); }
+  .btn-register {
+    font-size: 13px; padding: 7px 16px; border-radius: 8px;
+    border: none; background: var(--green); color: white;
+    cursor: pointer; font-family: inherit; font-weight: 500;
+  }
+  .btn-register:hover { background: var(--green-dark); }
+  .user-info { display: flex; align-items: center; gap: 10px; }
+  .user-email { font-size: 12px; color: var(--text2); }
+  .btn-logout {
+    font-size: 12px; padding: 5px 12px; border-radius: 8px;
+    border: 0.5px solid var(--border2); background: transparent;
+    color: var(--text2); cursor: pointer; font-family: inherit;
+  }
 
   .hero {
     padding: 72px 32px 56px; border-bottom: 0.5px solid var(--border);
@@ -61,15 +80,15 @@
   .filter-btn {
     font-size: 12px; padding: 7px 16px; border-radius: 20px;
     border: 0.5px solid var(--border2); background: transparent;
-    color: var(--text2); cursor: pointer; transition: all 0.15s; font-family: inherit;
+    color: var(--text2); cursor: pointer; font-family: inherit;
   }
   .filter-btn:hover { border-color: var(--green); color: var(--green); }
   .filter-btn.active { background: var(--green); color: white; border-color: var(--green); }
-  .tf-row { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .tf-row { display: flex; gap: 6px; margin-top: 12px; }
   .tf-pill {
     font-size: 11px; padding: 3px 10px; border-radius: 20px;
-    border: 0.5px solid var(--border); color: var(--text3); cursor: pointer;
-    transition: all 0.15s; font-family: 'DM Sans', sans-serif; background: transparent;
+    border: 0.5px solid var(--border); color: var(--text3);
+    cursor: pointer; font-family: 'DM Sans', sans-serif; background: transparent;
   }
   .tf-pill:hover { border-color: #185FA5; color: #6EB3F7; }
 
@@ -88,22 +107,107 @@
   .section-title { font-size: 13px; font-weight: 500; color: var(--text2); }
   .see-all { font-size: 12px; color: var(--green); text-decoration: none; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+
   .card {
-    background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px;
-    overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.15s;
+    background: var(--bg2); border: 0.5px solid var(--border);
+    border-radius: 12px; overflow: hidden; cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s; position: relative;
   }
   .card:hover { border-color: var(--border2); transform: translateY(-2px); }
   .card-chart { height: 120px; overflow: hidden; }
   .card-chart svg { width: 100%; height: 100%; }
   .card-body { padding: 14px; }
   .card-pair { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; font-family: 'DM Sans', sans-serif; }
-  .card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .card-meta { display: flex; gap: 6px; align-items: center; }
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
   .b-tf { background: rgba(24,95,165,0.15); color: #6EB3F7; }
   .b-buy { background: rgba(29,158,117,0.15); color: #4DD4A0; }
   .b-sell { background: rgba(216,90,48,0.15); color: #F09970; }
   .b-wait { background: rgba(186,117,23,0.15); color: #F0B840; }
   .card-time { font-size: 11px; color: var(--text3); margin-top: 8px; }
+  .free-tag {
+    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px;
+    background: rgba(29,158,117,0.1); color: #4DD4A0; margin-top: 6px;
+  }
+
+  .lock-overlay {
+    position: absolute; inset: 0;
+    backdrop-filter: blur(5px);
+    background: rgba(13,15,14,0.75);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; border-radius: 12px;
+  }
+  .lock-icon { font-size: 24px; color: var(--text2); }
+  .lock-text { font-size: 12px; color: var(--text2); text-align: center; }
+  .lock-btn {
+    font-size: 12px; padding: 6px 16px; border-radius: 20px;
+    background: var(--green); color: white; border: none;
+    cursor: pointer; font-family: inherit; font-weight: 500; margin-top: 2px;
+  }
+
+  /* MODAL */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: none; align-items: center; justify-content: center; z-index: 200;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: #141716; border: 0.5px solid var(--border2);
+    border-radius: 16px; width: 380px; padding: 32px; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; cursor: pointer; color: var(--text2); font-size: 20px;
+  }
+  html[dir="ltr"] .modal-close { right: auto; left: 16px; }
+  .modal-logo { font-size: 18px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 4px; font-family: 'DM Sans', sans-serif; }
+  .modal-logo span { color: var(--green); }
+  .modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 24px; }
+
+  .tabs { display: flex; border-bottom: 0.5px solid var(--border); margin-bottom: 20px; }
+  .tab { flex: 1; padding: 10px; font-size: 13px; color: var(--text2); cursor: pointer; text-align: center; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 500; }
+
+  .field-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+  .field-input {
+    width: 100%; padding: 10px 14px; border-radius: 8px;
+    border: 0.5px solid var(--border2); background: var(--bg3);
+    color: var(--text); font-size: 13px; font-family: inherit; margin-bottom: 14px;
+  }
+  .field-input:focus { outline: none; border-color: var(--green); }
+  .field-input::placeholder { color: var(--text3); }
+
+  .submit-btn {
+    width: 100%; padding: 11px; border-radius: 8px;
+    background: var(--green); color: white; border: none;
+    font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; margin-bottom: 14px;
+  }
+  .submit-btn:hover { background: var(--green-dark); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .divider { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .divider-line { flex: 1; height: 0.5px; background: var(--border); }
+  .divider-text { font-size: 11px; color: var(--text3); }
+
+  .google-btn {
+    width: 100%; padding: 10px; border-radius: 8px;
+    border: 0.5px solid var(--border2); background: var(--bg3);
+    color: var(--text); font-size: 13px; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px;
+  }
+  .google-btn:hover { border-color: var(--border2); background: var(--bg); }
+
+  .switch-text { font-size: 12px; color: var(--text2); text-align: center; }
+  .switch-link { color: var(--green); cursor: pointer; }
+
+  .msg { font-size: 12px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: center; }
+  .msg.error { background: rgba(216,90,48,0.15); color: #F09970; }
+  .msg.success { background: rgba(29,158,117,0.15); color: #4DD4A0; }
+
+  .done-wrap { text-align: center; padding: 12px 0; }
+  .done-emoji { font-size: 48px; margin-bottom: 16px; }
+  .done-title { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+  .done-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
 
   footer { border-top: 0.5px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; }
   .footer-logo { font-size: 14px; font-weight: 700; color: var(--text2); font-family: 'DM Sans', sans-serif; }
@@ -123,8 +227,15 @@
     <a href="#" data-fa="درباره" data-en="About">درباره</a>
   </div>
   <div class="nav-right">
-    <span class="nav-badge" data-fa="۱۲ تحلیل جدید" data-en="12 New Analyses">۱۲ تحلیل جدید</span>
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+    <div id="navGuest">
+      <button class="btn-login" onclick="openModal('login')" data-fa="ورود" data-en="Login">ورود</button>
+      <button class="btn-register" onclick="openModal('register')" data-fa="ثبت‌نام رایگان" data-en="Sign up free">ثبت‌نام رایگان</button>
+    </div>
+    <div id="navUser" style="display:none" class="user-info">
+      <span class="user-email" id="userEmail"></span>
+      <button class="btn-logout" onclick="logout()" data-fa="خروج" data-en="Logout">خروج</button>
+    </div>
   </div>
 </nav>
 
@@ -148,8 +259,8 @@
 </section>
 
 <div class="stats-bar">
-  <div class="stat-item"><div class="stat-num green">78%</div><div class="stat-label" data-fa="دقت تحلیل‌ها" data-en="Analysis Accuracy">دقت تحلیل‌ها</div></div>
-  <div class="stat-item"><div class="stat-num">142</div><div class="stat-label" data-fa="تحلیل ثبت‌شده" data-en="Published Analyses">تحلیل ثبت‌شده</div></div>
+  <div class="stat-item"><div class="stat-num green">78%</div><div class="stat-label" data-fa="دقت تحلیل‌ها" data-en="Accuracy">دقت تحلیل‌ها</div></div>
+  <div class="stat-item"><div class="stat-num">142</div><div class="stat-label" data-fa="تحلیل ثبت‌شده" data-en="Analyses">تحلیل ثبت‌شده</div></div>
   <div class="stat-item"><div class="stat-num">5</div><div class="stat-label" data-fa="بازار فعال" data-en="Active Markets">بازار فعال</div></div>
 </div>
 
@@ -158,27 +269,29 @@
     <span class="section-title" data-fa="آخرین تحلیل‌ها" data-en="Latest Analyses">آخرین تحلیل‌ها</span>
     <a href="#" class="see-all" data-fa="مشاهده همه ←" data-en="View all →">مشاهده همه ←</a>
   </div>
-  <div class="grid">
+  <div class="grid" id="analysisGrid">
 
     <div class="card">
       <div class="card-chart" style="background:rgba(29,158,117,0.05)">
-        <svg viewBox="0 0 260 120"><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+        <svg viewBox="0 0 260 120"><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,90 30,80 60,85 90,60 120,65 150,40 180,45 210,25 260,20 260,120 0,120" fill="rgba(29,158,117,0.07)" stroke="none"/></svg>
       </div>
       <div class="card-body">
         <div class="card-pair">XAU/USD — <span data-fa="طلا" data-en="Gold">طلا</span></div>
         <div class="card-meta"><span class="badge b-tf">M30</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
         <div class="card-time" data-fa="امروز · ۱۴:۳۰" data-en="Today · 14:30">امروز · ۱۴:۳۰</div>
+        <span class="free-tag" data-fa="رایگان" data-en="Free">رایگان</span>
       </div>
     </div>
 
     <div class="card">
       <div class="card-chart" style="background:rgba(216,90,48,0.05)">
-        <svg viewBox="0 0 260 120"><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78" fill="none" stroke="#D85A30" stroke-width="2"/><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78 260,0 0,0" fill="rgba(216,90,48,0.08)" stroke="none"/></svg>
+        <svg viewBox="0 0 260 120"><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78" fill="none" stroke="#D85A30" stroke-width="2"/><polyline points="0,20 30,28 60,22 90,45 120,38 150,65 180,58 210,82 260,78 260,0 0,0" fill="rgba(216,90,48,0.07)" stroke="none"/></svg>
       </div>
       <div class="card-body">
         <div class="card-pair">EUR/USD</div>
         <div class="card-meta"><span class="badge b-tf">H1</span><span class="badge b-sell" data-fa="▼ فروش" data-en="▼ Sell">▼ فروش</span></div>
         <div class="card-time" data-fa="امروز · ۱۱:۰۰" data-en="Today · 11:00">امروز · ۱۱:۰۰</div>
+        <span class="free-tag" data-fa="رایگان" data-en="Free">رایگان</span>
       </div>
     </div>
 
@@ -190,39 +303,55 @@
         <div class="card-pair">DOW JONES</div>
         <div class="card-meta"><span class="badge b-tf">H4</span><span class="badge b-wait" data-fa="● انتظار" data-en="● Wait">● انتظار</span></div>
         <div class="card-time" data-fa="دیروز · ۲۰:۰۰" data-en="Yesterday · 20:00">دیروز · ۲۰:۰۰</div>
+        <span class="free-tag" data-fa="رایگان" data-en="Free">رایگان</span>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-gbp">
       <div class="card-chart" style="background:rgba(29,158,117,0.05)">
-        <svg viewBox="0 0 260 120"><polyline points="0,100 40,85 70,90 100,65 130,55 160,35 200,40 240,20 260,18" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,100 40,85 70,90 100,65 130,55 160,35 200,40 240,20 260,18 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+        <svg viewBox="0 0 260 120"><polyline points="0,100 40,85 70,90 100,65 130,55 160,35 200,40 240,20 260,18" fill="none" stroke="#1D9E75" stroke-width="2"/></svg>
       </div>
       <div class="card-body">
         <div class="card-pair">GBP/USD</div>
         <div class="card-meta"><span class="badge b-tf">H1</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
         <div class="card-time" data-fa="دیروز · ۱۶:۰۰" data-en="Yesterday · 16:00">دیروز · ۱۶:۰۰</div>
       </div>
+      <div class="lock-overlay" id="lock-gbp" onclick="openModal('register')">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text" data-fa="فقط برای اعضا" data-en="Members only">فقط برای اعضا</div>
+        <button class="lock-btn" data-fa="ثبت‌نام رایگان" data-en="Sign up free">ثبت‌نام رایگان</button>
+      </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-usdjpy">
       <div class="card-chart" style="background:rgba(216,90,48,0.05)">
-        <svg viewBox="0 0 260 120"><polyline points="0,30 50,25 90,35 130,50 170,42 210,60 260,72" fill="none" stroke="#D85A30" stroke-width="2"/><polyline points="0,30 50,25 90,35 130,50 170,42 210,60 260,72 260,0 0,0" fill="rgba(216,90,48,0.08)" stroke="none"/></svg>
+        <svg viewBox="0 0 260 120"><polyline points="0,30 50,25 90,35 130,50 170,42 210,60 260,72" fill="none" stroke="#D85A30" stroke-width="2"/></svg>
       </div>
       <div class="card-body">
         <div class="card-pair">USD/JPY</div>
         <div class="card-meta"><span class="badge b-tf">D1</span><span class="badge b-sell" data-fa="▼ فروش" data-en="▼ Sell">▼ فروش</span></div>
         <div class="card-time" data-fa="۲ روز پیش · ۱۰:۰۰" data-en="2 days ago · 10:00">۲ روز پیش · ۱۰:۰۰</div>
       </div>
+      <div class="lock-overlay" id="lock-usdjpy" onclick="openModal('register')">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text" data-fa="فقط برای اعضا" data-en="Members only">فقط برای اعضا</div>
+        <button class="lock-btn" data-fa="ثبت‌نام رایگان" data-en="Sign up free">ثبت‌نام رایگان</button>
+      </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-btc">
       <div class="card-chart" style="background:rgba(29,158,117,0.05)">
-        <svg viewBox="0 0 260 120"><polyline points="0,80 40,70 80,75 110,55 140,45 170,30 210,35 260,15" fill="none" stroke="#1D9E75" stroke-width="2"/><polyline points="0,80 40,70 80,75 110,55 140,45 170,30 210,35 260,15 260,120 0,120" fill="rgba(29,158,117,0.08)" stroke="none"/></svg>
+        <svg viewBox="0 0 260 120"><polyline points="0,80 40,70 80,75 110,55 140,45 170,30 210,35 260,15" fill="none" stroke="#1D9E75" stroke-width="2"/></svg>
       </div>
       <div class="card-body">
         <div class="card-pair">BTC/USD</div>
         <div class="card-meta"><span class="badge b-tf">H4</span><span class="badge b-buy" data-fa="▲ خرید" data-en="▲ Buy">▲ خرید</span></div>
         <div class="card-time" data-fa="۳ روز پیش · ۰۸:۰۰" data-en="3 days ago · 08:00">۳ روز پیش · ۰۸:۰۰</div>
+      </div>
+      <div class="lock-overlay" id="lock-btc" onclick="openModal('register')">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text" data-fa="فقط برای اعضا" data-en="Members only">فقط برای اعضا</div>
+        <button class="lock-btn" data-fa="ثبت‌نام رایگان" data-en="Sign up free">ثبت‌نام رایگان</button>
       </div>
     </div>
 
@@ -234,8 +363,154 @@
   <div class="footer-text" data-fa="تمامی تحلیل‌ها جنبه آموزشی دارند" data-en="All analyses are for educational purposes only">تمامی تحلیل‌ها جنبه آموزشی دارند</div>
 </footer>
 
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <div id="stepMain">
+      <div class="modal-logo">Pasha <span>Investment</span></div>
+      <div class="modal-sub" id="modalSub">به جمع تحلیلگران بپیوند</div>
+      <div class="tabs">
+        <div class="tab active" id="tab-reg" onclick="switchTab('register')" data-fa="ثبت‌نام" data-en="Sign up">ثبت‌نام</div>
+        <div class="tab" id="tab-log" onclick="switchTab('login')" data-fa="ورود" data-en="Login">ورود</div>
+      </div>
+      <div id="msgBox" style="display:none" class="msg"></div>
+      <div class="field-label" data-fa="ایمیل" data-en="Email">ایمیل</div>
+      <input class="field-input" type="email" id="emailInput" placeholder="email@example.com"/>
+      <div class="field-label" data-fa="رمز عبور" data-en="Password">رمز عبور</div>
+      <input class="field-input" type="password" id="passInput" placeholder="••••••••"/>
+      <button class="submit-btn" id="submitBtn" onclick="handleAuth()">ثبت‌نام</button>
+      <div class="divider"><div class="divider-line"></div><div class="divider-text" data-fa="یا" data-en="or">یا</div><div class="divider-line"></div></div>
+      <button class="google-btn" onclick="loginWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <span data-fa="ورود با گوگل" data-en="Sign in with Google">ورود با گوگل</span>
+      </button>
+      <div class="switch-text" id="switchText">قبلاً ثبت‌نام کردی؟ <span class="switch-link" onclick="switchTab('login')">وارد شو</span></div>
+    </div>
+
+    <div id="stepDone" style="display:none" class="done-wrap">
+      <div class="done-emoji">🎉</div>
+      <div class="done-title" data-fa="خوش اومدی!" data-en="Welcome!">خوش اومدی!</div>
+      <div class="done-sub" data-fa="حالا به همه تحلیل‌ها دسترسی داری" data-en="You now have access to all analyses">حالا به همه تحلیل‌ها دسترسی داری</div>
+      <button class="submit-btn" onclick="closeModal()" data-fa="رفتن به تحلیل‌ها" data-en="Go to analyses">رفتن به تحلیل‌ها</button>
+    </div>
+
+    <div id="stepVerify" style="display:none" class="done-wrap">
+      <div class="done-emoji">📧</div>
+      <div class="done-title" data-fa="ایمیل تأیید ارسال شد" data-en="Verification email sent">ایمیل تأیید ارسال شد</div>
+      <div class="done-sub" data-fa="لینک تأیید به ایمیلت ارسال شد — بعد از تأیید برگرد و وارد شو" data-en="Check your email for a confirmation link">لینک تأیید به ایمیلت ارسال شد — بعد از تأیید برگرد و وارد شو</div>
+      <button class="submit-btn" onclick="switchToLogin()" data-fa="رفتن به صفحه ورود" data-en="Go to login">رفتن به صفحه ورود</button>
+    </div>
+
+  </div>
+</div>
+
 <script>
+const SUPABASE_URL = 'https://ifmtdjxrzraqkjugvsrb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7pXk2ziXzQ5Tz2K11fkaIw_S08nO6-8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentTab = 'register';
 let lang = 'fa';
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    showUser(session.user.email);
+    unlockCards();
+  } else {
+    showGuest();
+    lockCards();
+  }
+});
+
+function showUser(email) {
+  document.getElementById('navGuest').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  document.getElementById('userEmail').textContent = email;
+}
+function showGuest() {
+  document.getElementById('navGuest').style.display = 'flex';
+  document.getElementById('navUser').style.display = 'none';
+}
+function unlockCards() {
+  ['gbp','usdjpy','btc'].forEach(id => {
+    const el = document.getElementById('lock-' + id);
+    if (el) el.style.display = 'none';
+  });
+}
+function lockCards() {
+  ['gbp','usdjpy','btc'].forEach(id => {
+    const el = document.getElementById('lock-' + id);
+    if (el) el.style.display = 'flex';
+  });
+}
+
+async function handleAuth() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value;
+  const btn = document.getElementById('submitBtn');
+  if (!email || !pass) return showMsg('ایمیل و رمز عبور را وارد کن', 'error');
+  btn.disabled = true;
+  btn.textContent = '...';
+  if (currentTab === 'register') {
+    const { error } = await sb.auth.signUp({ email, password: pass });
+    btn.disabled = false;
+    btn.textContent = lang === 'fa' ? 'ثبت‌نام' : 'Sign up';
+    if (error) return showMsg(error.message, 'error');
+    showStep('stepVerify');
+  } else {
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    btn.disabled = false;
+    btn.textContent = lang === 'fa' ? 'ورود' : 'Login';
+    if (error) return showMsg(lang === 'fa' ? 'ایمیل یا رمز اشتباه است' : 'Invalid email or password', 'error');
+    showStep('stepDone');
+  }
+}
+
+async function loginWithGoogle() {
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+}
+
+async function logout() {
+  await sb.auth.signOut();
+}
+
+function openModal(type) {
+  document.getElementById('modalBg').classList.add('open');
+  showStep('stepMain');
+  switchTab(type);
+}
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+}
+function handleBgClick(e) {
+  if (e.target === document.getElementById('modalBg')) closeModal();
+}
+function switchTab(type) {
+  currentTab = type;
+  const isReg = type === 'register';
+  document.getElementById('tab-reg').className = 'tab' + (isReg ? ' active' : '');
+  document.getElementById('tab-log').className = 'tab' + (!isReg ? ' active' : '');
+  document.getElementById('submitBtn').textContent = isReg ? (lang === 'fa' ? 'ثبت‌نام' : 'Sign up') : (lang === 'fa' ? 'ورود' : 'Login');
+  document.getElementById('modalSub').textContent = isReg ? (lang === 'fa' ? 'به جمع تحلیلگران بپیوند' : 'Join our community') : (lang === 'fa' ? 'خوش برگشتی' : 'Welcome back');
+  document.getElementById('switchText').innerHTML = isReg
+    ? (lang === 'fa' ? 'قبلاً ثبت‌نام کردی؟ <span class="switch-link" onclick="switchTab(\'login\')">وارد شو</span>' : 'Already have an account? <span class="switch-link" onclick="switchTab(\'login\')">Login</span>')
+    : (lang === 'fa' ? 'هنوز ثبت‌نام نکردی؟ <span class="switch-link" onclick="switchTab(\'register\')">ثبت‌نام رایگان</span>' : 'No account? <span class="switch-link" onclick="switchTab(\'register\')">Sign up free</span>');
+  hideMsg();
+}
+function switchToLogin() { showStep('stepMain'); switchTab('login'); }
+function showStep(id) {
+  ['stepMain','stepDone','stepVerify'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
+  });
+}
+function showMsg(text, type) {
+  const box = document.getElementById('msgBox');
+  box.textContent = text; box.className = 'msg ' + type; box.style.display = 'block';
+}
+function hideMsg() { document.getElementById('msgBox').style.display = 'none'; }
+
 function toggleLang() {
   lang = lang === 'fa' ? 'en' : 'fa';
   const isEn = lang === 'en';
