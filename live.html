@@ -1,0 +1,236 @@
+<?php ?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>لایو تریدینگ — Pasha Investment</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--white:#fff;--off:#f5f5f7;--gray1:#e8e8ed;--gray2:#6e6e73;--gray3:#1d1d1f;--green:#1a7f5a;--green-light:#e8f5f0;--amber:#b5651d;--amber-light:#fdf6e8;}
+body{background:var(--gray3);color:var(--white);font-family:'Vazirmatn',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(29,29,31,0.92);backdrop-filter:blur(20px);border-bottom:0.5px solid rgba(255,255,255,0.1);padding:0 44px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.nav-logo{text-decoration:none;}
+.nav-logo img{height:44px;}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--white);}
+.nav-links a.active{font-weight:600;}
+.soon{font-size:10px;background:var(--amber-light);color:var(--amber);padding:2px 6px;border-radius:6px;margin-left:4px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:#f87171;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.btn-login{font-size:13px;padding:7px 16px;border-radius:980px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.8);cursor:pointer;font-family:inherit;}
+.btn-register{font-size:13px;padding:7px 18px;border-radius:980px;border:none;background:var(--green);color:white;cursor:pointer;font-family:inherit;font-weight:500;}
+.user-info{display:flex;align-items:center;gap:10px;}
+.user-email{font-size:12px;color:rgba(255,255,255,0.6);}
+.btn-logout{font-size:12px;padding:5px 12px;border-radius:980px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-family:inherit;}
+
+.hero{padding:48px 44px 32px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.hero-title{font-size:32px;font-weight:700;letter-spacing:-0.5px;}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.5);}
+
+.trader-info{display:flex;align-items:center;gap:16px;}
+.trader-avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.1);}
+.trader-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.trader-name{font-size:15px;font-weight:600;}
+.trader-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;}
+
+.widget-wrap{padding:0;height:calc(100vh - 200px);min-height:600px;}
+#ctrader-plugin-root{width:100%;height:100%;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;z-index:200;}
+.modal-bg.open{display:flex;}
+.modal{background:#1c1c1e;border:0.5px solid rgba(255,255,255,0.1);border-radius:20px;width:400px;padding:36px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.5);}
+.modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;color:rgba(255,255,255,0.6);font-size:16px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.modal-logo{font-size:20px;font-weight:700;color:var(--white);text-align:center;margin-bottom:4px;font-family:-apple-system,sans-serif;}
+.modal-logo span{color:var(--green);}
+.modal-sub{font-size:14px;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:28px;}
+.tabs{display:flex;background:rgba(255,255,255,0.05);border-radius:10px;padding:3px;margin-bottom:24px;}
+.tab{flex:1;padding:8px;font-size:14px;color:rgba(255,255,255,0.5);cursor:pointer;text-align:center;border-radius:8px;transition:all 0.2s;font-weight:500;}
+.tab.active{background:rgba(255,255,255,0.1);color:var(--white);}
+.field-label{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:6px;font-weight:500;}
+.field-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--white);font-size:15px;font-family:inherit;margin-bottom:14px;}
+.field-input:focus{outline:none;border-color:var(--green);}
+.field-input::placeholder{color:rgba(255,255,255,0.2);}
+.submit-btn{width:100%;padding:13px;border-radius:980px;background:var(--green);color:white;border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px;}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.divider-line{flex:1;height:0.5px;background:rgba(255,255,255,0.1);}
+.divider-text{font-size:12px;color:rgba(255,255,255,0.3);}
+.google-btn{width:100%;padding:12px;border-radius:980px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--white);font-size:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;font-weight:500;}
+.switch-text{font-size:13px;color:rgba(255,255,255,0.4);text-align:center;}
+.switch-link{color:var(--green);cursor:pointer;}
+.msg{font-size:13px;padding:12px 16px;border-radius:10px;margin-bottom:14px;text-align:center;font-weight:500;background:rgba(220,38,38,0.15);color:#f87171;}
+.done-wrap{text-align:center;padding:16px 0;}
+.done-emoji{font-size:52px;margin-bottom:16px;}
+.done-title{font-size:22px;font-weight:700;color:var(--white);margin-bottom:8px;}
+.done-sub{font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:28px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/"><img src="/logo.png" alt="Pasha Investment"/></a>
+  <div class="nav-links">
+    <a href="/analyses.php">تحلیل‌ها</a>
+    <a href="/live.php" class="active">لایو تریدینگ</a>
+    <a href="/about.php">درباره</a>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    <div id="navGuest" style="display:flex;gap:8px;">
+      <button class="btn-login" onclick="openModal('login')">ورود</button>
+      <button class="btn-register" onclick="openModal('register')">ثبت‌نام رایگان</button>
+    </div>
+    <div id="navUser" style="display:none" class="user-info">
+      <span class="user-email" id="userEmail"></span>
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="hero-title">لایو تریدینگ 📡</div>
+      <div class="hero-sub">معاملات زنده — در لحظه ببین، یاد بگیر</div>
+    </div>
+    <div class="trader-info">
+      <div class="trader-avatar"><img src="/pasha.jpg" alt="پاشا مهروز"/></div>
+      <div>
+        <div class="trader-name">پاشا مهروز</div>
+        <div class="trader-sub">Pasha Investment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="widget-wrap">
+  <div id="ctrader-plugin-root" style="width:100%;height:100%;position:relative;"></div>
+</div>
+
+<script id="init" type="text/javascript" defer src="https://ct.fxpro-group.com/widget.js"></script>
+<script type="text/javascript">
+const script = document.getElementById('init');
+script.onload = () => {
+  putInitScript('runPlugin');
+  runPlugin('ctrader-plugin-root', {"route":"/esp/116805/?lang=en&theme=dark&u=pasha.mahrooz","appConfig":{"strategy":{"showStrategyPromotion":true}}});
+};
+</script>
+
+<div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="stepMain">
+      <div class="modal-logo">Pasha <span>Investment</span></div>
+      <div class="modal-sub" id="modalSub">به جمع تحلیلگران بپیوند</div>
+      <div class="tabs">
+        <div class="tab active" id="tab-reg" onclick="switchTab('register')">ثبت‌نام</div>
+        <div class="tab" id="tab-log" onclick="switchTab('login')">ورود</div>
+      </div>
+      <div id="msgBox" style="display:none" class="msg"></div>
+      <div class="field-label">ایمیل</div>
+      <input class="field-input" type="email" id="emailInput" placeholder="email@example.com"/>
+      <div class="field-label">رمز عبور</div>
+      <input class="field-input" type="password" id="passInput" placeholder="••••••••"/>
+      <button class="submit-btn" id="submitBtn" onclick="handleAuth()">ثبت‌نام</button>
+      <div class="divider"><div class="divider-line"></div><div class="divider-text">یا</div><div class="divider-line"></div></div>
+      <button class="google-btn" onclick="loginWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        ورود با گوگل
+      </button>
+      <div class="switch-text" id="switchText">قبلاً ثبت‌نام کردی؟ <span class="switch-link" onclick="switchTab('login')">وارد شو</span></div>
+    </div>
+    <div id="stepDone" style="display:none" class="done-wrap">
+      <div class="done-emoji">🎉</div>
+      <div class="done-title">خوش اومدی!</div>
+      <div class="done-sub">حالا به همه تحلیل‌ها دسترسی داری</div>
+      <button class="submit-btn" onclick="closeModal()">بستن</button>
+    </div>
+    <div id="stepVerify" style="display:none" class="done-wrap">
+      <div class="done-emoji">📧</div>
+      <div class="done-title">ایمیل ارسال شد</div>
+      <div class="done-sub">لینک تأیید به ایمیلت ارسال شد</div>
+      <button class="submit-btn" onclick="switchToLogin()">رفتن به صفحه ورود</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ifmtdjxrzraqkjugvsrb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7pXk2ziXzQ5Tz2K11fkaIw_S08nO6-8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentTab = 'register';
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (session) { showUser(session.user.email); } else { showGuest(); }
+});
+
+function showUser(email) {
+  document.getElementById('navGuest').style.display = 'none';
+  document.getElementById('navUser').style.display = 'flex';
+  document.getElementById('userEmail').textContent = email;
+}
+function showGuest() {
+  document.getElementById('navGuest').style.display = 'flex';
+  document.getElementById('navUser').style.display = 'none';
+}
+async function handleAuth() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value;
+  const btn = document.getElementById('submitBtn');
+  if (!email || !pass) return showMsg('ایمیل و رمز عبور را وارد کن');
+  btn.disabled = true;
+  if (currentTab === 'register') {
+    const { error } = await sb.auth.signUp({ email, password: pass });
+    btn.disabled = false;
+    if (error) return showMsg(error.message);
+    showStep('stepVerify');
+  } else {
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    btn.disabled = false;
+    if (error) return showMsg('ایمیل یا رمز اشتباه است');
+    showStep('stepDone');
+  }
+}
+async function loginWithGoogle() {
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+}
+async function logout() { await sb.auth.signOut(); }
+function openModal(type) {
+  document.getElementById('modalBg').classList.add('open');
+  showStep('stepMain'); switchTab(type);
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+function handleBgClick(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
+function switchTab(type) {
+  currentTab = type;
+  const isReg = type === 'register';
+  document.getElementById('tab-reg').className = 'tab'+(isReg?' active':'');
+  document.getElementById('tab-log').className = 'tab'+(!isReg?' active':'');
+  document.getElementById('submitBtn').textContent = isReg ? 'ثبت‌نام' : 'ورود';
+  document.getElementById('modalSub').textContent = isReg ? 'به جمع تحلیلگران بپیوند' : 'خوش برگشتی';
+  document.getElementById('switchText').innerHTML = isReg
+    ? 'قبلاً ثبت‌نام کردی؟ <span class="switch-link" onclick="switchTab(\'login\')">وارد شو</span>'
+    : 'هنوز ثبت‌نام نکردی؟ <span class="switch-link" onclick="switchTab(\'register\')">ثبت‌نام رایگان</span>';
+  hideMsg();
+}
+function switchToLogin() { showStep('stepMain'); switchTab('login'); }
+function showStep(id) {
+  ['stepMain','stepDone','stepVerify'].forEach(s => {
+    document.getElementById(s).style.display = s===id?'block':'none';
+  });
+}
+function showMsg(text) {
+  const box = document.getElementById('msgBox');
+  box.textContent = text; box.style.display = 'block';
+}
+function hideMsg() { document.getElementById('msgBox').style.display = 'none'; }
+</script>
+</body>
+</html>
